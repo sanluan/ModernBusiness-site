@@ -1,0 +1,87 @@
+<#assign attribute=getContentAttribute(content.id)/>
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8" />
+        <title>${(metadata.alias)!} - ${content.title}</title>
+		<meta name="keywords" content="<#list getKeywords(content.title) as a>${a}<#sep>,</#list>"/>
+		<meta name="description" content="${(content.description)!}"/>
+       <@tools.includePlace path="/common/697054d4-2b69-4476-b4fe-868c61316959.html"/> <#-- header -->
+    </head>
+    <body class="d-flex flex-column">
+        <main class="flex-shrink-0">
+            <@tools.includePlace path="/common/0b31f69d-dc03-407b-95af-88be3db0289e.html"/> <#-- nav -->
+            <!-- Page Content-->
+            <section class="py-5">
+                <div class="container px-5 my-5">
+                    <div class="row gx-5">
+                        <div class="col-lg-9">
+							<header class="mb-4">
+								<h1 class="fw-bolder mb-1">讨论：<a href="${content.url}">${content.title}</a></h1>
+							</header>
+                            <@include path="/fragment/comment.html"/><#-- 评论列表 -->
+                        </div>
+						<div class="col-lg-3">
+							<@sys.user id=content.userId;user>
+                            <div class="d-flex align-items-center mb-4">
+                                <img class="img-fluid rounded-circle big-avatar" src="${user.cover!(site.sitePath+'assets/images/avatar.png')}" alt="${user.nickname}" />
+                                <div class="ms-3">
+                                    <div class="fw-bold">${user.nickname}</div>
+                                    <div class="text-muted"><@cms.category id=content.categoryId;category>${category.name}</@cms.category></div>
+                                </div>
+                            </div>
+							</@sys.user>
+							<div class="px-2">
+								<h3 class="my-3 fs-5">该作者的其他热门讨论</h3>
+								<@cms.contentList userId=content.userId orderField="comments" pageSize=5>
+								<ul class="list-unstyled">
+									<#list page.list as a>
+									<li class="text-truncate mb-2">
+										<span class="float-end ms-3"><a class="text-secondary" href="${site.dynamicPath}comment/${a.id}">${a.comments}评论</a></span>
+										<a href="${a.url}">${a.title}</a>
+									</li>
+									</#list>
+								</ul>
+								</@cms.contentList>
+							</div>
+							<div class="px-2">
+								<h3 class="my-3 fs-5">该栏目下其他热门讨论</h3>
+								<@cms.contentList category=content.categoryId orderField="comments" pageSize=5>
+								<ul class="list-unstyled">
+									<#list page.list as a>
+									<li class="text-truncate mb-2">
+										<span class="float-end ms-3"><a class="text-secondary" href="${site.dynamicPath}comment/${a.id}">${a.comments}评论</a></span>
+										<a href="${a.url}">${a.title}</a>
+									</li>
+									</#list>
+								</ul>
+								</@cms.contentList>
+							</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+		<script>
+            var itemString="itemType=content&itemId=${content.id}";
+			var templatePath='${.current_template_name?keep_after('/')}';
+        </script>
+        <@tools.includePlace path="/common/704bd033-154c-40f4-a8c5-2d36c092c3fd.html"/> <#-- footer -->
+		<script src="${site.sitePath}assets/js/jquery-3.6.4.min.js"></script>
+    <script>
+
+		function score(contentId){
+			$.getJSON('${site.dynamicPath!}score/score?itemId='+contentId+'&itemType=content&_csrf=<@tools.csrfToken/>', function(data){
+				alert("评分成功!");
+				location.reload();
+			});
+		}
+		function unscore(contentId){
+			$.getJSON('${site.dynamicPath!}score/unscore?itemId='+contentId+'&itemType=content&_csrf=<@tools.csrfToken/>', function(data){
+				alert("取消评分!");
+				location.reload();
+			});
+		}
+    </script>
+    </body>
+</html>

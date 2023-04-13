@@ -1,0 +1,62 @@
+<#assign attribute=getCategoryAttribute(category.id)/>
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8" />
+        <title>${(attribute.title)?has_content?then(attribute.title,category.name)!}</title>
+		<meta name="keywords" content="${(attribute.keywords)!}"/>
+		<meta name="description" content="${(attribute.description)!}"/>
+        <@tools.includePlace path="/common/697054d4-2b69-4476-b4fe-868c61316959.html"/> <#-- header -->
+    </head>
+    <body class="d-flex flex-column h-100">
+        <main class="flex-shrink-0">
+            <@tools.includePlace path="/common/0b31f69d-dc03-407b-95af-88be3db0289e.html"/> <#-- nav -->
+            <!-- Page Content-->
+            <section class="py-5">
+                <div class="container px-5 my-5">
+                    <div class="text-center mb-5" data-diy="category" data-diy-id="${category.id}">
+                        <h1 class="fw-bolder">${category.name}</h1>
+                        <p class="lead fw-normal text-muted mb-0">${attribute.description!}</p>
+                    </div>
+                    <div class="row gx-5">
+						<@import path="/fragment/tools.ftl" namespace="t"/><#-- 工具 -->
+						<@cms.contentList categoryId=category.id>
+                        <div class="col-xl-8" data-diy="content">
+							<#list page.list as a>
+                            	<h2 class="fw-bolder mb-3" data-diy-item="${a.id}">${a.title}</h2>
+								<@cms.contentList parentId=a.id>
+								<div class="accordion mb-5" id="accordion${a.id}">
+									<#list page.list as b>
+										<@t.merge 'contentIds' b.id/>
+									</#list>
+									<#assign map=getContentAttributes(t.contentIds)/>
+									<#list page.list as b>
+									<div class="accordion-item" data-diy-item="${b.id}">
+										<h3 class="accordion-header" id="heading${b.id}"><button class="accordion-button<#if !a?is_first||!b?is_first> collapsed</#if>" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${b.id}" aria-expanded="true" aria-controls="collapse${b.id}">${b.title}</button></h3>
+										<div class="accordion-collapse collapse<#if a?is_first&&b?is_first> show</#if>" id="collapse${b.id}" aria-labelledby="heading${b.id}" data-bs-parent="#accordion${a.id}">
+											<div class="accordion-body">
+												${(map[b.id?string].text?no_esc)!}
+											</div>
+										</div>
+									</div>
+									</#list>
+								</div>
+								</@cms.contentList>
+							</#list>
+                        </div>
+						</@cms.contentList>
+                        <div class="col-xl-4">
+                            <@tools.includePlace path="/common/c1ca602c-8999-4b55-b3a3-9ae2fac15fcb.html"/> <#-- 联系方式卡片 -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+		<script>
+            var itemString="itemType=category&itemId=${category.id}";
+			var templatePath='${.current_template_name?keep_after('/')}';
+        </script>
+        <@tools.includePlace path="/common/704bd033-154c-40f4-a8c5-2d36c092c3fd.html"/> <#-- footer -->
+		
+    </body>
+</html>

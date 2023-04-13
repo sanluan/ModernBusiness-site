@@ -1,0 +1,27 @@
+<!-- Testimonial section-->
+<div class="py-5 bg-light" data-diy="place" data-diy-id="${path}">
+	<div class="container px-5 my-5 swiper customer-testimonials">
+		<div class="swiper-wrapper">
+			<#list page.list as a>
+			<div class="swiper-slide">
+				<div class="row gx-5 justify-content-center">
+					<div class="col-lg-10 col-xl-7">				
+						<div class="text-center">
+							<div class="fs-4 mb-4 fst-italic">${a.description!}</div>
+							<div class="d-flex align-items-center justify-content-center pb-4">
+								<img class="rounded-circle me-3" src="${a.cover}" alt="${a.title}" />
+								<div class="fw-bold">
+									${a.title}
+									<span class="fw-bold text-primary mx-1">/</span>
+									${(getPlaceAttribute(a.id).job)!}
+								</div>
+							</div>
+						</div>				
+					</div>
+				</div>
+			</div>
+			</#list>
+		</div>
+		<div class="swiper-pagination"></div>
+	</div>
+</div>

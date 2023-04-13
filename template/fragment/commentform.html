@@ -1,0 +1,62 @@
+<#-- Comment form-->
+<#if user?has_content>
+	<form method="post" action="${site.dynamicPath}comment/save">
+		<input type="hidden" name="_csrf" value="<@tools.csrfToken/>"/>
+		<input type="hidden" name="id" value="${commentId!}"/>
+		<input type="hidden" name="contentId" value="${content.id}"/>
+		<input name="returnUrl" type="hidden" value="${site.dynamicPath}comment/${content.id!}"/>
+		<#if replyId?has_content>
+			<@cms.comment id=replyId;comment>
+				<@sys.user id=comment.userId;user>
+					<div class="d-flex mb-2">
+						<div class="ms-3">
+							<div class="fw-bold"><span class="text-muted fw-normal me-3">回复</span>${user.nickname}</div>
+							${comment.text!}
+						</div>
+					</div>
+					<input type="hidden" name="replyId" value="${replyId!}"/>
+				</@sys.user>
+			</@cms.comment>
+		</#if>
+		<textarea class="form-control mb-3" name="text" rows="3" placeholder="参与讨论"><@cms.comment id=commentId>${object.text!}</@cms.comment></textarea>
+		<div class="row">
+			<div class="col-md-4">
+				<@sys.configData code="safe">
+					<#if object.captcha?has_content && object.captcha?split(",")?seq_contains("comment")>
+						<div class="input-group">
+							<input class="form-control" name="captcha" type="text" autocomplete="off" placeholder="验证码" title="验证码"/>
+							<img src="${site.dynamicPath}getCaptchaImage?${.now?long}" alt="点击更新" onclick="this.src=this.src+'&'+new Date().getTime()"/>
+						</div>
+					</#if>
+				</@sys.configData>
+			</div>
+			<div class="col-md-8">
+				<#if error?has_content>
+					<span class="text-danger"><@t.message error/></span>
+				</#if>
+				<input type="submit" class="btn btn-primary float-end mt-3 mt-md-0" value="提交"/>
+			</div>
+		</div>
+	</form>
+	<@cms.commentList advanced=true userId=user.id contentId=content.id status=2>
+		<#list page.list as a>
+			<div class="d-flex pb-2 border-bottom pt-2">
+				<div class="flex-shrink-0">
+					<img class="rounded-circle avatar" src="${user.cover!(site.sitePath+'assets/images/avatar.png')}" alt="${user.nickname}" />
+				</div>
+				<div class="ms-3">
+					<div class="fw-bold mb-2">
+						${user.nickname}
+						<span class="ms-3 fw-normal text-warning">待审核</span>
+						<span class="ms-3 fw-normal"><a href="${site.dynamicPath}comment/${content.id}?commentId=${a.id}">编辑</a></span>
+					</div>
+					${a.text!}
+				</div>
+			</div>
+		</#list>
+	</@cms.commentList>
+<#else>
+	<div>
+		<div class="form-control text-center mb-3" style="line-height:5;"><a href="${site.dynamicPath}login.html">登录后发布评论</a></div>
+	</div>
+</#if>

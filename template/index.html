@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+		<meta charset="utf-8" />
+		<title>${(metadata.extendData.title)!} ${site.name}</title>
+		<meta name="keywords" content="${(metadata.extendData.keywords)!}"/>
+        <meta name="description" content="${(metadata.extendData.description)!}" />
+		<@tools.includePlace path="/common/697054d4-2b69-4476-b4fe-868c61316959.html"/> <#-- header -->
+    </head>
+    <body class="d-flex flex-column h-100">
+        <main class="flex-shrink-0">
+            <@tools.includePlace path="/common/0b31f69d-dc03-407b-95af-88be3db0289e.html"/> <#-- nav -->
+            <@tools.includePlace path="/home/dd2c7520-ea5f-498f-882d-8f4ff9673b5e.html"/> <#-- Focus -->
+            <@tools.includePlace path="/home/72fefe6c-1cb5-4606-bf17-78170bf5366f.html"/> <#-- Features -->
+            <@tools.includePlace path="/home/aab8d612-3a71-45bd-9dc7-8c2605150fe6.html"/> <#-- Testimonial -->
+            <!-- Blog preview section-->
+            <section class="py-5">
+                <div class="container px-5 my-5">
+                    <@tools.includePlace path="/home/932e3f40-3512-4e71-8384-3c89b999802f.html"/> <#-- Blog -->
+                    <@tools.includePlace path="/home/efa7a561-5f4a-440b-a224-5f2ed057ce4f.html"/> <#-- Email Sign up -->
+                </div>
+            </section>
+        </main>
+		<script>
+			var templatePath='${.current_template_name?keep_after('/')}';
+        </script>
+        <@tools.includePlace path="/common/704bd033-154c-40f4-a8c5-2d36c092c3fd.html"/> <#-- footer -->
+    </body>
+</html>

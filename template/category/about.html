@@ -1,0 +1,80 @@
+<#assign attribute=getCategoryAttribute(category.id)/>
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8" />
+        <title>${(attribute.title)?has_content?then(attribute.title,category.name)!}</title>
+		<meta name="keywords" content="${(attribute.keywords)!}"/>
+		<meta name="description" content="${(attribute.description)!}"/>
+        <@tools.includePlace path="/common/697054d4-2b69-4476-b4fe-868c61316959.html"/> <#-- header -->
+    </head>
+    <body class="d-flex flex-column">
+        <main class="flex-shrink-0">
+            <@tools.includePlace path="/common/0b31f69d-dc03-407b-95af-88be3db0289e.html"/> <#-- nav -->
+            <#-- header-->
+            <header class="py-5">
+                <div class="container px-5">
+                    <div class="row justify-content-center">
+                        <div class="col-lg-8 col-xxl-6">
+                            <div class="text-center my-5">
+                                <h1 class="fw-bolder mb-3">${(attribute.aboutTitle)!}</h1>
+                                <p class="lead fw-normal text-muted mb-4">${(attribute.aboutDescription)!}</p>
+                                <a class="btn btn-primary btn-lg" href="#scroll-target">查看我们的故事</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+			<#-- header-->
+			<@cms.category code="story";category>
+				<@cms.contentList categoryId=category.id pageSize=category.pageSize>
+				<div id="scroll-target">
+					<#list page.list as a>
+					<section class="py-5<#if a?is_odd_item> bg-light</#if>">
+						<div class="container px-5 my-5">
+							<div class="row gx-5 align-items-center">
+								<div class="col-lg-6<#if a?is_even_item> order-first order-lg-last</#if>"><img class="img-fluid rounded mb-5 mb-lg-0" src="${a.cover}" alt="${a.title}" /></div>
+								<div class="col-lg-6">
+									<h2 class="fw-bolder">${a.title}</h2>
+									<p class="lead fw-normal text-muted mb-0">${a.description}</p>
+								</div>
+							</div>
+						</div>
+					</section>
+					</#list>
+				</div>
+				</@cms.contentList>
+			</@cms.category>
+            <#-- Team members section-->
+            <section class="py-5 bg-light">
+				<@cms.category code="team";category>
+                <div class="container px-5 my-5" data-diy="category" data-diy-id="${category.id}">
+                    <div class="text-center">
+                        <h2 class="fw-bolder">${category.name}</h2>
+                        <p class="lead fw-normal text-muted mb-5">${(getCategoryAttribute(category.id).description)!}</p>
+                    </div>
+					<@cms.contentList categoryId=category.id pageSize=category.pageSize>
+                    <div class="row gx-5 row-cols-1 row-cols-sm-2 row-cols-xl-4 justify-content-center" data-diy="content">
+						<#list page.list as a>
+                        <div class="col mb-5 mb-5 mb-xl-0" data-diy-item="${a.id}">
+                            <div class="text-center">
+                                <img class="img-fluid rounded-circle mb-4 px-4" src="${a.cover}" alt="${a.title}"/>
+                                <h5 class="fw-bolder">${a.title}</h5>
+                                <div class="fst-italic text-muted">${a.description!}</div>
+                            </div>
+                        </div>
+						</#list>
+                    </div>
+					</@cms.contentList>
+                </div>
+				</@cms.category>
+            </section>
+			<#-- Team members section-->
+        </main>
+		<script>
+            var itemString="itemType=category&itemId=${category.id}";
+			var templatePath='${.current_template_name?keep_after('/')}';
+        </script>
+        <@tools.includePlace path="/common/704bd033-154c-40f4-a8c5-2d36c092c3fd.html"/> <#-- footer -->
+    </body>
+</html>

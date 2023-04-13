@@ -1,0 +1,7 @@
+<div class="col-auto" data-diy="place" data-diy-id="${path}">
+	<#list page.list as a>
+		<a class="link-light small" href="${a.url}" data-diy-item="${a.id}">${a.title}</a>
+		<#sep>
+		<span class="text-white mx-1">&middot;</span>
+	</#list>
+</div>

@@ -1,0 +1,5 @@
+<@task.publishPlace>
+<#list map?keys as k>
+	${k!}	${map[k]?string('成功','失败')}
+</#list>
+</@task.publishPlace>

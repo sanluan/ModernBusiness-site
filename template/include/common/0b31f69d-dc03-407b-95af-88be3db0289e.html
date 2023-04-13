@@ -1,0 +1,41 @@
+<!-- Navigation-->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark" data-diy="place" data-diy-id="${path}">
+	<div class="container px-5">
+		<a class="navbar-brand" href="${site.dynamicPath}">${site.name}</a>
+		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+		<div class="collapse navbar-collapse" id="navbarSupportedContent">
+			<ul class="navbar-nav ms-auto mb-2 mb-lg-0" data-diy="category">
+				<li class="nav-item"><a class="nav-link" href="${site.dynamicPath}" data-id="home">首页</a></li>
+				<@cms.categoryList>
+					<#list page.list as a>
+						<#if a.childIds?has_content>
+							<@cms.categoryList parentId=a.id>
+								<#if page.totalCount gt 0>
+									<li class="nav-item dropdown">
+										<a class="nav-link dropdown-toggle" id="navbarDropdown${a.code}" href="${a.url}" data-id="${a.id}" data-diy-item="${a.id}" role="button" data-bs-toggle="dropdown" aria-expanded="false">${a.name}</a>
+										<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown${a.code}">
+											<#list page.list as a>
+												<li><a class="dropdown-item" href="${a.url}" data-id="${a.id}" data-diy-item="${a.id}" >${a.name}</a></li>
+											</#list>
+										</ul>
+
+									</li>
+								<#else>
+									<li class="nav-item"><a class="nav-link" href="${a.url}" data-id="${a.id}" data-diy-item="${a.id}">${a.name}</a></li>
+								</#if>
+							</@cms.categoryList>
+						<#else>				
+							<li class="nav-item"><a class="nav-link" href="${a.url}" data-id="${a.id}" data-diy-item="${a.id}">${a.name}</a></li>
+						</#if>
+					</#list>
+				</@cms.categoryList>
+				<li class="nav-item">
+					<form action="${site.dynamicPath}search.html" method="get" class="d-flex" role="search">
+						<input name="word" type="search" class="form-control me-2"/>
+						<input type="submit" class="btn btn-outline-success" value="搜索"/>
+					</form>
+				</li>
+			</ul>
+		</div>
+	</div>
+</nav>

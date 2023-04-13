@@ -1,0 +1,159 @@
+<#assign attribute=getContentAttribute(content.id)/>
+<@cms.category id=content.categoryId;category>
+    <#assign
+        temp=getContentPage(attribute.text!'',pageIndex)
+        page=temp.page
+        text=temp.text
+    />
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8" />
+        <title>${content.title} - ${(category.name)!}</title>
+		<meta name="keywords" content="<#list getKeywords(content.title) as a>${a}<#sep>,</#list>"/>
+		<meta name="description" content="${(content.description)!}"/>
+       <@tools.includePlace path="/common/697054d4-2b69-4476-b4fe-868c61316959.html"/> <#-- header -->
+    </head>
+    <body class="d-flex flex-column">
+        <main class="flex-shrink-0">
+            <@tools.includePlace path="/common/0b31f69d-dc03-407b-95af-88be3db0289e.html"/> <#-- nav -->
+            <!-- Page Content-->
+            <section class="py-5">
+                <div class="container px-5 my-5">
+                    <div class="row gx-5">
+                        <div class="col-lg-9">
+                            <article>
+                                <header class="mb-4">
+                                    <h1 class="fw-bolder mb-1">${content.title}</h1>
+                                    <div class="text-muted fst-italic mb-2">${content.publishDate?date}</div>
+									<@cms.tag ids=content.tagIds>
+										<#list map as k,t>										
+                                    <a class="badge bg-secondary text-decoration-none link-light" href="${site.dynamicPath}search/?tagId=${k}">${t.name}</a>
+										</#list>
+									</@cms.tag>
+                                </header>
+                                <#if content.cover?has_content>
+									<figure class="mb-4 text-center"><img class="img-fluid rounded" src="${content.cover}" alt="${content.title}" /></figure>
+								</#if>
+                                <section class="mb-4 content">
+									${(text?no_esc)!}
+									
+									<#if content.hasImages>
+										 <@cms.contentFileList contentId=content.id fileTypes='image'>
+											 <#list page.list as file>
+												 <figure class="ms-2 text-center">
+													 <img loading="lazy" src="${(file.filePath)!}" alt="${(file.description)!}"/>
+												 	 <figcaption>${file?counter}. ${(file.description)!}</figcaption>
+												</figure>
+											 </#list>
+										 </@cms.contentFileList>
+									</#if>
+									<#if content.hasFiles>
+										<@cms.contentFileList contentId=content.id downloadURL=true fileTypes='video,audio,document,other'>
+											<#list page.list as file>
+												<p><a href="${(file.filePath)!}" download="${(file.description)!}">${file?counter}. ${(file.description)!}</a></p>
+											</#list>
+										</@cms.contentFileList>
+									</#if>
+                                </section>
+								<#if page.totalCount gt 1>
+								<ul class="pagination mb-5 overflow-auto">
+									<li class="page-item"><a class="page-link" href="${getPage(content.url,page.prePage)}">上一页</a></li>
+									<#list 1..page.totalCount as n>
+										<li class="page-item<#if n=page.pageIndex> active</#if>"><a class="page-link" href="${getPage(content.url,n)}">${n}</a></li>
+									</#list>
+									<li class="page-item"><a class="page-link" href="${getPage(content.url,page.nextPage)}">下一页</a></li>
+								</ul>
+								</#if>
+                            </article>
+							<div class="text-center mb-3">								
+								<#assign maxScores=5/>
+								<@sys.configData code="site"><#assign maxScores=(object.max_scores?number)!maxScores/></@sys.configData>
+								<span class="scores">
+									<#list 1..maxScores as i>
+										<a href="javascript:void(0);" title="${i} 分"><span class="icon <#if content.score gte i>icon-scores-star<#else>icon-scores-unstar</#if>"></span></a>
+									</#list>
+									<#if content.scores gt 0><b>${content.score}</b>分</#if>
+									<#if user?has_content>
+										<@cms.userScore userId=user.id itemType='content' itemId=content.id>
+											<span class="unscores ms-3">我的评分:${object.score} <a href="javascript:void(0);">取消</a></span>
+										</@cms.userScore>
+									</#if>
+								</span>
+							</div>
+							<#assign pageIndex=1/>
+                            <@include path="/fragment/comment.html"/><#-- 评论列表 -->
+                        </div>
+						<div class="col-lg-3">
+							<@sys.user id=content.userId>
+                            <div class="d-flex align-items-center mb-4">
+                                <img class="img-fluid rounded-circle big-avatar" src="${object.cover!(site.sitePath+'assets/images/avatar.png')}" alt="${object.nickname}" />
+                                <div class="ms-3">
+                                    <div class="fw-bold">${object.nickname}</div>
+                                    <div class="text-muted">${category.name}</div>
+                                </div>
+                            </div>
+							</@sys.user>
+							<div class="px-2">
+								<h3 class="my-3 fs-5">该作者其他文章</h3>
+								<@cms.contentList userId=content.userId pageSize=5>
+								<ul class="list-unstyled">
+									<#list page.list as a>
+									<li class="text-truncate mb-2"><span class="float-end ms-3 text-secondary ">${a.publishDate?string('MM-dd')}</span><a href="${a.url}">${a.title}</a></li>
+									</#list>
+								</ul>
+								</@cms.contentList>
+							</div>
+							<div class="px-2">
+								<h3 class="my-3 fs-5">该栏目其他文章</h3>
+								<@cms.contentList categoryId=category.id pageSize=5>
+								<ul class="list-unstyled">
+									<#list page.list as a>
+									<li class="text-truncate mb-2"><span class="float-end ms-3 text-secondary ">${a.publishDate?string('MM-dd')}</span><a href="${a.url}">${a.title}</a></li>
+									</#list>
+								</ul>
+								</@cms.contentList>
+							</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+		<script>
+            var itemString="itemType=content&itemId=${content.id}";
+			var templatePath='${.current_template_name?keep_after('/')}';
+        </script>
+        <@tools.includePlace path="/common/704bd033-154c-40f4-a8c5-2d36c092c3fd.html"/> <#-- footer -->
+		<script src="${site.sitePath}assets/js/jquery-3.6.4.min.js"></script>
+    	<script src="${site.sitePath}assets/ueditor/ueditor.parse.min.js"></script>
+    <script>
+        $.getJSON('${site.dynamicPath!}api/contentClick?id=${content.id}', function(data){});
+
+        uParse('#content',{rootPath: '${site.sitePath}assets/ueditor/'});
+
+		if($('.scores').find('.unscores').length){
+			$('.unscores a').click(function(){
+				$.ajax({url:'${site.dynamicPath!}score/unscore?itemId=${content.id}&itemType=content&_csrf=<@_csrfToken/>', success:function(data){
+					location.reload();
+				}});
+			});
+		}else{
+			$('.scores a').hover(function(){
+				$(this).find('span').removeClass('icon-scores-unstar').addClass('icon-scores-star');
+				$(this).prevAll().find('span').removeClass('icon-scores-unstar').addClass('icon-scores-star');
+			},function(){
+				$(this).find('span').removeClass('icon-scores-star').addClass('icon-scores-unstar');
+				$(this).prevAll().find('span').removeClass('icon-scores-star').addClass('icon-scores-unstar');
+			});
+			$('.scores a').click(function(){
+				$.ajax({url:'${site.dynamicPath!}score/score?itemId=${content.id}&itemType=content&scores='+($(this).index()+1)+'&_csrf=<@_csrfToken/>', success:function(data){
+					location.reload();
+				}});
+			});
+		}
+		
+		
+    </script>
+    </body>
+</html>
+</@cms.category>

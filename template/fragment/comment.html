@@ -1,0 +1,69 @@
+<#-- Comments section-->
+<section>
+	<@import path="/fragment/tools.ftl" namespace="t"/><#-- 工具 -->
+	<div class="card bg-light">
+		<div class="card-body" id="comment">
+			<@include path="/fragment/commentform.html"/><#-- 评论表单 -->
+			<#-- Comment with nested comments-->
+	<@cms.commentList contentId=content.id emptyReply=true replyId=replyId pageIndex=pageIndex pageSize=10>
+		<#list page.list as a>
+			<@t.merge 'userIds' a.userId!/>
+			<@t.merge 'userIds' a.replyUserId!/>
+		</#list>
+		<@sys.user ids=t.userIds!><#assign userMap=map!/></@sys.user>
+		<#list page.list as a>
+			<div class="d-flex pb-2 border-bottom pt-2">
+				<#-- Parent comment-->
+				<div class="flex-shrink-0">
+					<img class="rounded-circle avatar" src="${userMap[a.userId?string].cover!(site.sitePath+'assets/images/avatar.png')}" alt="${userMap[a.userId?string].nickname}" />
+				</div>
+				<div class="ms-3">
+					<div class="fw-bold  mb-2">
+						${userMap[a.userId?string].nickname}
+						<#if a.userId=content.userId><span class="ms-1 fw-normal text-warning">作者</span></#if>
+						<#if userMap[a.userId?string].superuser><span class="ms-1 fw-normal text-danger">管理员</span></#if>
+						<a class="text-muted fw-normal ms-2" href="${site.dynamicPath}comment/${content.id}?replyId=${a.id}">回复</a>
+					</div>
+					${a.text!}
+					<#if a.replies gt 0>
+						<@cms.commentList contentId=content.id replyId=a.id orderType='asc' pageSize=10>
+							<#list page.list as a>
+								<@t.merge 'userIds' a.userId!/>
+								<@t.merge 'userIds' a.replyUserId!/>
+							</#list>
+							<@sys.user ids=t.userIds!><#assign userMap=map!/></@sys.user>
+							<#list page.list as a>
+								<#-- Child comment -->
+								<div class="d-flex mt-4">
+									<div class="flex-shrink-0">
+										<img class="rounded-circle avatar" src="${userMap[a.userId?string].cover!(site.sitePath+'assets/images/avatar.png')}" alt="${userMap[a.userId?string].nickname}" />
+									</div>
+									<div class="ms-3">
+										<div class="fw-bold mb-2">
+											${userMap[a.userId?string].nickname}
+											<#if a.userId=content.userId><span class="ms-1 fw-normal text-warning">作者</span></#if>
+											<#if userMap[a.userId?string].superuser><span class="ms-1 fw-normal text-danger">管理员</span></#if>
+											<a class="text-muted fw-normal ms-2" href="${site.dynamicPath}comment/${content.id}?replyId=${a.id}">回复</a></div>
+										${a.text!}
+									</div>
+								</div>
+							</#list>
+							<#if page.totalPage gt 1><a class="btn btn-warning mt-3" href="${site.dynamicPath}comment/${content.id}?replyId=${a.id}">查看更多</a></#if>
+						</@cms.commentList>
+					</#if>
+				</div>	
+			</div>
+		</#list>
+		<#if page.totalCount gt 1>
+			<ul class="pagination pt-4 overflow-auto">
+				<li class="page-item"><a class="page-link" href="${getPage(site.dynamicPath+'comment/'+content.id,page.prePage)}<#if replyId?has_content>?replyId=${replyId}</#if>">上一页</a></li>
+				<#list 1..page.totalPage as n>
+				<li class="page-item<#if n=page.pageIndex> active</#if>"><a class="page-link" href="${getPage(site.dynamicPath+'comment/'+content.id,n)}<#if replyId?has_content>?replyId=${replyId}</#if>">${n}</a></li>
+				</#list>
+				<li class="page-item"><a class="page-link" href="${getPage(site.dynamicPath+'comment/'+content.id,page.nextPage)}<#if replyId?has_content>?replyId=${replyId}</#if>">下一页</a></li>
+			</ul>
+		</#if>
+	</@cms.commentList>
+		</div>		
+	</div>
+</section>

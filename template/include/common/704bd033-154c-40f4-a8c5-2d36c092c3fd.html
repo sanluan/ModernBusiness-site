@@ -1,0 +1,31 @@
+<!-- Footer-->
+<footer class="bg-dark py-4 mt-auto">
+	<div class="container px-5" data-diy="place" data-diy-id="${path}">
+		<div class="row align-items-center justify-content-between flex-column flex-sm-row">
+			<div class="col-auto"><div class="small m-0 text-white">Copyright &copy; ${site.name} ${.now?string('yyyy')}</div></div>
+			<@tools.includePlace path="/common/c7747b4a-ab5f-4751-9da4-65d21428eb0c.html"/> <#-- Footer Link -->
+		</div>
+	</div>
+</footer>
+<@tools.placeMetadata path='/common/697054d4-2b69-4476-b4fe-868c61316959.html';metadata>
+<#if 'true'=(metadata.extendData.useCdn)!'false'>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/swiper@9/swiper-bundle.min.js"></script>
+<#else>
+<script src="${site.sitePath}assets/bootstrap-5.2.3/bootstrap.bundle.min.js"></script>
+<script src="${site.sitePath}assets/swiper-9.2.0/swiper-bundle.min.js"></script>
+</#if>
+</@tools.placeMetadata>
+<!-- Core theme js-->
+<script src="${site.sitePath}assets/js/modern-business.js"></script>
+<script src="${site.sitePath}assets/js/cms.support.js"></script>
+<script>    
+    var ca = cmsAnalytics();
+    var url='${site.dynamicPath}api/visit/record';
+    if("string" ==typeof itemString){
+        url=url+"?"+itemString;
+    }
+	ca.setDomain('${site.dynamicPath?keep_after('//')?keep_before('/')?keep_before(':')}');
+	ca.setPath('/');
+    ca.report(url);
+</script>

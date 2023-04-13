@@ -1,0 +1,73 @@
+<#assign attribute=getCategoryAttribute(category.id)/>
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="utf-8" />
+        <title>${(attribute.title)?has_content?then(attribute.title,category.name)!}</title>
+		<meta name="keywords" content="${(attribute.keywords)!}"/>
+		<meta name="description" content="${(attribute.description)!}"/>
+        <@tools.includePlace path="/common/697054d4-2b69-4476-b4fe-868c61316959.html"/> <#-- header -->
+    </head>
+    <body class="d-flex flex-column h-100">
+        <main class="flex-shrink-0">
+            <@tools.includePlace path="/common/0b31f69d-dc03-407b-95af-88be3db0289e.html"/> <#-- nav -->
+            <!-- Page Content-->
+            <section class="py-5">
+				<@cms.contentList categoryId=category.id containChild=category.containChild pageIndex=pageIndex pageSize=category.pageSize>
+                <div class="container px-5 my-5">
+                    <div class="text-center mb-5">
+                        <h1 class="fw-bolder">${category.name}</h1>
+                        <p class="lead fw-normal text-muted mb-0">${attribute.description!}</p>
+                    </div>
+                    <div class="row gx-5">
+						<#list page.list as a>
+                        <div class="col-lg-4">
+                            <div class="position-relative mb-5">
+                                <img class="img-fluid rounded-3 mb-3" src="${a.cover}" alt="${a.title}" />
+                                <a class="h3 fw-bolder text-decoration-none link-dark stretched-link" href="${a.url}">${a.title}</a>
+                            </div>
+                        </div>
+						</#list>
+                    </div>
+					<ul class="pagination">
+						<#if category.url?contains('?')><#assign pageParameter="pageIndex"/></#if>
+						<#assign
+							start=1
+							end=page.totalPage
+						/>
+						<#if (page.pageIndex-5) gt start>
+							<#assign start=page.pageIndex-4/>
+						</#if>
+						<#if (page.pageIndex+5) lt end>
+							<#assign end=page.pageIndex+4/>
+						</#if>
+						<li class="page-item"><a class="page-link" href="${getPage(category.url,page.prePage,pageParameter)}">上一页</a></li>
+						<#if start gt 1>
+							<li class="page-item"><a class="page-link" href="${category.url}">1</a></li>
+							<li class="page-item"><span class="page-link" href="javascript:void(0)">...</span></li>
+						</#if>
+						<#list start..end as n>
+							<li class="page-item<#if n=page.pageIndex> active</#if>"><a class="page-link" href="${getPage(category.url,n,pageParameter)}">${n}</a></li>
+						</#list>
+						<#if end lt page.totalPage>
+							<li class="page-item"><span class="page-link" href="javascript:void(0)">...</span></li>
+							<li class="page-item"><a class="page-link" href="${getPage(category.url,page.totalPage,pageParameter)}">${page.totalPage}</a></li>
+						</#if>
+						<li class="page-item"><a class="page-link" href="${getPage(category.url,page.nextPage,pageParameter)}">下一页</a></li>
+					</ul>
+                </div>
+				</@cms.contentList>
+            </section>
+            <section class="py-5 bg-light">
+                <div class="container px-5 my-5">
+                    <h2 class="display-4 fw-bolder mb-4">${attribute.title!}</h2>
+                </div>
+            </section>
+        </main>
+        <script>
+            var itemString="itemType=category&itemId=${category.id}";
+			var templatePath='${.current_template_name?keep_after('/')}';
+        </script>
+		<@tools.includePlace path="/common/704bd033-154c-40f4-a8c5-2d36c092c3fd.html"/> <#-- footer -->
+    </body>
+</html>
