@@ -57,6 +57,6 @@
 	</@cms.commentList>
 <#else>
 	<div>
-		<div class="form-control text-center mb-3" style="line-height:5;"><a href="${site.dynamicPath}login.html">登录后发布评论</a></div>
+		<div class="form-control text-center mb-3" style="line-height:5;"><a href="${site.dynamicPath}login.html?returnUrl=${(site.dynamicPath+'comment/'+content.id)?url}">登录后发布评论</a></div>
 	</div>
 </#if>
