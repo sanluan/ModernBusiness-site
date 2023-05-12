@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="utf-8">
 	<title>${(metadata.alias)!} ${word?has_content?then(' - '+word,'')} ${site.name}</title>
@@ -10,72 +10,78 @@
 <body class="d-flex flex-column">
 	<main class="flex-shrink-0"  data-diy="config" data-diy-id="site">
 		<@tools.includePlace path="/common/0b31f69d-dc03-407b-95af-88be3db0289e.html"/> <#-- nav -->
-<#macro merge name value><#if !.vars[name]??><@"<#assign ${name}=''>"?interpret /></#if><#if value?has_content><@"<#assign ${name}=${name}+'${value},'>"?interpret /></#if></#macro>
-<@cms.search word=word tagId=tagId highlight=true pageIndex=pageIndex pageSize=10>
-    <#if page.totalCount gt 0>
-        <h1>Results</h1>
-    <#list page.list as a>
-        <@merge 'categoryIds' a.categoryId!/>
-    </#list>
-    <@cms.category ids=categoryIds><#assign categoryMap=map/></@cms.category>
-        <div>
-    <#list page.list as a>
-            <article data-diy-item="${a.id}">
-                <h3>[<a href="${(categoryMap[a.categoryId?string].url)!}" target="_blank">${(categoryMap[a.categoryId?string].name)!}</a>]<a href="<#if a.onlyUrl>${site.dynamicPath}content/redirect?id=${a.id}<#else>${a.url!}</#if>" target="_blank">${a.title?no_esc}</a></h3>
-                <p>
-                    <#if a.cover?has_content><img src="${a.cover}" alt="${a.title}"/></#if>
-                    ${(a.description?no_esc)!}
-                </p>
-            </article>
-    </#list>
-        </div>
-        <div>
-            <#if !page.firstPage>
-                <a href="?word=${word!}&tagId=${tagId!}&pageIndex=${page.prePage}">Previous page</a>
-            <#else>
-                <span>Previous page</span>
-            </#if>
-            <#assign
-                start=1
-                end=page.totalPage
-            />
-            <#if (page.pageIndex-5) gt start>
-                <#assign start=page.pageIndex-4/>
-            </#if>
-            <#if (page.pageIndex+5) lt end>
-                <#assign end=page.pageIndex+4/>
-            </#if>
-            <#if start gt 1>
-                <a href="?word=${word!}&tagId=${tagId!}">1</a> ...
-            </#if>
-            <#list start..end as n>
-                <#if n=page.pageIndex>
-                    ${n}
-                <#else>
-                    <a href="?word=${word!}&tagId=${tagId!}&pageIndex=${n}">${n}</a>
-                </#if>
-            </#list>
-            <#if end lt page.totalPage>
-                ... <a href="?word=${word!}&tagId=${tagId!}&pageIndex=${page.totalPage}">${page.totalPage}</a>
-            </#if>
-            <#if !page.lastPage>
-                <a href="?word=${word!}&tagId=${tagId!}&pageIndex=${page.nextPage}">Next page</a>
-            <#else>
-                <span>Next page</span>
-            </#if>
-        </div>
-    </#if>
-</@cms.search>
-        <aside>
-            <h3>Popular content</h3>
-            <ul data-diy="content">
-<@cms.contentList orderField='clicks' pageSize=10>
-    <#list page.list as a>
-                <li data-diy-item="${a.id}"><a href="<#if a.onlyUrl>${site.dynamicPath}content/redirect?id=${a.id}<#else>${a.url!}</#if>" target="_blank">${a.title}</a><span>${a.clicks}</span></li>
-    </#list>
-</@cms.contentList>
-            </ul>
-        </aside>
+		<section class="py-5">
+			<div class="container px-5">			
+				<@import path="/fragment/tools.ftl" namespace="t"/><#-- 工具 -->
+				<@cms.search word=word tagId=tagId highlight=true pageIndex=pageIndex pageSize=10>
+				<h2 class="fw-bolder fs-5 mb-4">搜索结果</h2>
+				<div class="row gx-5">
+					<#list page.list as a>
+						<@t.merge 'categoryIds' a.categoryId/>
+						<@t.merge 'userIds' a.userId/>
+					</#list>
+					<@cms.category ids=t.categoryIds><#assign categoryMap=map/></@cms.category>
+					<@sys.user ids=t.userIds><#assign userMap=map/></@sys.user>
+					<#list page.list as a>
+						<div class="col-lg-4 mb-5">
+							<div class="card h-100 shadow border-0">
+								<#if a.cover?has_content><img class="card-img-top" src="${a.cover!}" alt="${a.title}"/></#if>
+								<div class="card-body p-4">
+									<div class="badge bg-primary bg-gradient rounded-pill mb-2">${(categoryMap[a.categoryId?string].name)!}</div>
+									<a class="text-decoration-none link-dark stretched-link" href="${a.url}"><div class="h5 card-title mb-3">${a.title?no_esc}</div></a>
+									<p class="card-text mb-0">${(a.description?no_esc)!}</p>
+								</div>
+								<div class="card-footer p-4 pt-0 bg-transparent border-top-0">
+									<div class="d-flex align-items-end justify-content-between">
+										<div class="d-flex align-items-center">
+											<img class="rounded-circle me-3 avatar" src="${(userMap[a.userId?string].cover)!(site.sitePath+'assets/images/avatar.png')}" alt="${(userMap[a.userId?string].nickname)!}" />
+											<div class="small">
+												<div class="fw-bold">${(userMap[a.userId?string].nickname)!}</div>
+												<div class="text-muted">${a.publishDate?date} &middot; ${a.clicks} 阅读</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</#list>
+				</div>
+
+				<ul class="pagination">			
+					<#assign
+						url=''
+						start=1
+						end=page.totalPage
+					/>
+					<#if word?has_content>
+						<#assign url+='?word='+word/>
+					</#if>
+					<#if tagId?has_content>
+						<#assign url+='&tagId='+tagId/>
+					</#if>
+					<#if (page.pageIndex-5) gt start>
+					<#assign start=page.pageIndex-4/>
+					</#if>
+					<#if (page.pageIndex+5) lt end>
+					<#assign end=page.pageIndex+4/>
+					</#if>
+					<li class="page-item"><a class="page-link" href="${getPage(url,page.prePage,'pageIndex')}">上一页</a></li>
+					<#if start gt 1>
+					<li class="page-item"><a class="page-link" href="${url}">1</a></li>
+					<li class="page-item"><span class="page-link" href="javascript:void(0)">...</span></li>
+					</#if>
+					<#list start..end as n>
+					<li class="page-item<#if n=page.pageIndex> active</#if>"><a class="page-link" href="${getPage(url,n,'pageIndex')}">${n}</a></li>
+					</#list>
+					<#if end lt page.totalPage>
+					<li class="page-item"><span class="page-link" href="javascript:void(0)">...</span></li>
+					<li class="page-item"><a class="page-link" href="${getPage(url,page.totalPage,'pageIndex')}">${page.totalPage}</a></li>
+					</#if>
+					<li class="page-item"><a class="page-link" href="${getPage(url,page.nextPage,'pageIndex')}">下一页</a></li>
+				</ul>
+				</@cms.search>
+			</div>
+		</section>
     </main>
 	<script>
 		var templatePath='${.current_template_name?keep_after('/')}';
